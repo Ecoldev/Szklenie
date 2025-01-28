@@ -1,0 +1,27 @@
+---
+- name: Implementacja serwera WWW
+  hosts: servers
+  tasks:
+    - name: instalacja pakietu httpd
+      yum:
+        name: httpd
+        state: latest
+    
+    - name: stworzenie pliku index.html
+      copy:
+        content: "Hello Apache\n"
+        dest: /var/www/html/index.html
+    
+    - name: uruchomienie i autostart usługi httpd
+      service:
+        name: httpd
+        state: started
+        enabled: true
+    
+    - name: odblokowanie portu 80/tcp w firewallu
+      firewalld:
+        port: 80/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+``
