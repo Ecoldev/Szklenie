@@ -14,6 +14,5 @@ TASK [Konfiguracja firewalld - dodanie usługi FTP] ****************************
 ERROR! The requested handler 'Restart firewalld' was not found in either the main handlers list nor in the listening handlers list
 
 
-- name: Instalacja i konfiguracja vsftpd
-      ^ here
+
 
