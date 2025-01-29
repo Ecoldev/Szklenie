@@ -1,12 +1,40 @@
 
-[devops@base ansible_playbooks]$ ansible-playbook mariadb_when.yml
-[WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit
+[devops@base ansible_playbooks]$ ansible-playbook -i inventory.ini install_vsftpd.yml --ask-become-pass
+BECOME password:
+[WARNING]: Found both group and host with same name: poznan
+[WARNING]: Found both group and host with same name: gdansk
+
+PLAY [Instalacja i konfiguracja vsftpd] *****************************************************
+
+TASK [Gathering Facts] **********************************************************************
+fatal: [gdansk]: UNREACHABLE! => {"changed": false, "msg": "Failed to connect to the host via ssh: ssh: connect to host gdansk port 22: Connection refused", "unreachable": true}
+ok: [poznan]
+
+TASK [Instalacja vsftpd] ********************************************************************
+ok: [poznan]
+
+TASK [Uruchomienie i włączenie vsftpd przy starcie] *****************************************
+ok: [poznan]
+
+TASK [Konfiguracja firewalld - dodanie usługi FTP] ******************************************
+ok: [poznan]
+
+TASK [Upewnienie się, że katalog /var/ftp/pub istnieje] *************************************
+ok: [poznan]
+
+TASK [Kopiowanie plików do katalogu /var/ftp/pub] *******************************************
+ok: [poznan] => (item=plik1.txt)
+ok: [poznan] => (item=plik2.txt)
+
+TASK [Modyfikacja pliku konfiguracyjnego vsftpd] ********************************************
+ok: [poznan]
+
+PLAY RECAP **********************************************************************************
+gdansk                     : ok=0    changed=0    unreachable=1    failed=0    skipped=0    rescued=0    ignored=0
+poznan                     : ok=7    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+[devops@base ansible_playbooks]$ ansible-playbook mariadb_when.yml                           [WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit
 localhost does not match 'all'
-[WARNING]: Could not match supplied host pattern, ignoring: servers
 
 PLAY [Instalacja serwera MariaDB na hostach spełniających warunki] **************************
 skipping: no hosts matched
-
-PLAY RECAP **********************************************************************************
-
-[devops@base ansible_playbooks]$
