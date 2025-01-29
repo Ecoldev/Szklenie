@@ -1,0 +1,63 @@
+Ćwiczenie 2 - QUIZ - Ansible-galaxy
+PYTANIE 1:
+Wydajesz komendę zdefiniowaną jak poniżej. Jak musi wyglądać zawartość
+pliku, aby rola zainstalowała się z pliku /test.tar?
+ansible-galaxy install -r requirements.yml -p roles
+Odpowiedź A:
+Odpowiedź B:
+Odpowiedź C:
+Odpowiedź D:
+- src: /test.tar
+name: test
+- src: file:///test.tar
+name: test
+- role:
+name: test
+src: /test.tar
+- role:
+name: test
+src: file:///test.tar
+ANSIBLE - zeszyt ćwiczeń
+93
+PYTANIE 2:
+Czasami poniższa komenda nie działa gdy nie ma dostępu do Internetu,
+jakiej opcji użyć w takim przypadku?
+ansible-galaxy init rola
+Odpowiedź A:
+--without-refresh
+Odpowiedź B:
+--offline
+Odpowiedź C:
+--no-updates
+Odpowiedź D:
+--no-login
+ANSIBLE - zeszyt ćwiczeń
+94
+PYTANIE 3:
+Jak nazywa się moduł, który pozwala używać roli w play’u?
+Odpowiedź A:
+role
+Odpowiedź B:
+include_role
+Odpowiedź C:
+with_role
+Odpowiedź D:
+roles
+ANSIBLE - zeszyt ćwiczeń
+95
+Odpowiedzi: 1B, 2B, 3B
+ANSIBLE - zeszyt ćwiczeń
+96
+Rozdział 8 - Dodatkowe funkcjonalności i
+troubleshooting
+Ćwiczenie 1 - Dynamic inventory
+Kroki wstępne: Katalog roboczy: ~/ansible-dynamic-inventory
+Cel: Przykład działania dynamicznych inventory
+Opis: Wykorzystanie skryptu napisanego w PHP do generowania
+dynamicznych inventory.
+Kod skryptu oparty na:
+https://www.jeffgeerling.com/blog/creating-custom-dynamic-invent
+ories-ansible
+1. Stwórz katalog inventory (istniejący plik inventory nazwij inventory_static i
+umieść w tym katalogu). Dodatkowo sprawdź, że statyczne inventory cały czas
+działa np. odpytaj się o host g
