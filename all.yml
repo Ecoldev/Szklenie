@@ -1,0 +1,3 @@
+common_packages:
+  - policycoreutils-python-utils
+  - epel-release
