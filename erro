@@ -11,3 +11,5 @@ The offending line appears to be:
 
 
 ansible-galaxy collection install ansible.posix
+
+ansible-doc -l | grep firewalld
