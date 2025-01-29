@@ -1,0 +1,147 @@
+Rozdział 6 - Zarządzanie zadaniami
+Ćwiczenie 1 - Instrukcja when
+Kroki wstępne: Katalog roboczy: ~/ansible-when
+Cel: Wykonywanie zadań tylko i wyłącznie gdy spełniony jest określony
+warunek
+Opis: Baza mariadb będzie instalowana tylko i wyłącznie na hostach,które
+spełnią dwa warunki:
+- Host posiada wystarczającą ilość RAMu
+- Host oparty jest na dystrybucji, który jest supportowana
+1. Napisz moduł, który będzie zawierać:
+a. Listę supportowanych dystrybucji - Debian, RedHat
+b. Określoną minimalną ilość RAMu - 20000MB
+c. Zadanie korzystające z modułu yum i instrukcji when określającej czy
+pakiet mariadb może zostać zainstalowany
+d. Jeśli któryś z warunków nie jest spełniony ansible powinien o tym napisać
+korzystając z modułu debug
+---
+- name: Instalacja serwera MariaDB na hostach spelniajacych warunki
+hosts: servers
+vars:
+min_ram_mb: 20000
+supported_distros:
+- Debian
+- RedHat
+tasks:
+- name: instalacja pakietu mariadb
+yum:
+name: mariadb
+state: latest
+when:
+- ansible_memtotal_mb >= min_ram_mb
+ANSIBLE - zeszyt ćwiczeń
+66
+2. Uruchom playbook - powinieneś zobaczyć dwie informacje o niespełnionych
+warunkach
+[user@warszawa ansible-when]$ ansible-playbook ./mariadb-when.yml
+(...)
+TASK [instalacja pakietu mariadb]
+**************************************************************************************************
+**********************************************************
+skipping: [gdynia]
+skipping: [krakow]
+TASK [informacje o RAM]
+**************************************************************************************************
+********************************************************************
+ok: [gdynia] => {
+"msg": "gdynia posiada za malo RAMu - 990MB a powinno byc minimum
+20000MB"
+}
+ok: [krakow] => {
+"msg": "krakow posiada za malo RAMu - 990MB a powinno byc minimum
+20000MB"
+}
+TASK [informacje o distro]
+**************************************************************************************************
+- ansible_distribution in supported_distros
+- name: informacje o RAM
+debug:
+msg: "{{ inventory_hostname }} posiada za malo RAMu - {{ ansible_memtotal_mb
+}}MB a powinno byc minimum {{ min_ram_mb }}MB"
+when:
+- ansible_memtotal_mb < min_ram_mb
+- name: informacje o distro
+debug:
+msg: "{{ inventory_hostname }} jest {{ ansible_distribution }} ktory nie jest
+supportowany a supportowane sa tylko {{ supported_distros }}"
+when:
+- ansible_distribution not in supported_distros
+ANSIBLE - zeszyt ćwiczeń
+67
+3. Dodaj w pliku playbook’a w definicji supportowanych dystrybucji rekord: CentOS
+4. Uruchom playbook jeszcze raz. Tym razem informacje o niewspieranej
+dystrybucji nie powinna się pojawić.
+5. Zmodyfikuj ponownie playbook i zmień definicje min_ram_mb na taką którą
+spełnią hosty w ćwiczeniu np. 200mb. Początek play’a powinien wyglądać tak:
+*****************************************************************
+ok: [gdynia] => {
+"msg": "gdynia jest CentOS ktory nie jest supportowany a supportowane
+sa tylko [u'Debian', u'RedHat']"
+}
+ok: [krakow] => {
+"msg": "krakow jest CentOS ktory nie jest supportowany a supportowane
+sa tylko [u'Debian', u'RedHat']"
+}
+PLAY RECAP
+**************************************************************************************************
+*********************************************************************************
+gdynia : ok=3 changed=0
+ignored=0
+: ok=3 changed=0
+ignored=0
+unreachable=0 failed=0 skipped=1
+rescued=0
+krakow
+rescued=0
+unreachable=0 failed=0 skipped=1
+supported_distros:
+- Debian
+- RedHat
+- CentOS
+[user@warszawa ansible-when]$ ansible-playbook ./mariadb-when.yml
+(...)
+---
+- name: Instalacja serwera MariaDB na hostach spelniajacych warunki
+hosts: servers
+vars:
+ANSIBLE - zeszyt ćwiczeń
+68
+6. Uruchom playbook ponownie, mariadb powinna zainstalować się na serwerach z
+grupy servers
+[user@warszawa ansible-when]$ ansible-playbook ./mariadb-when.yml
+PLAY [Instalacja serwera MariaDB na hostach spelniajacych warunki]
+**************************************************************************************************
+*************************
+TASK [Gathering Facts]
+**************************************************************************************************
+*********************************************************************
+ok: [krakow]
+ok: [gdynia]
+TASK [instalacja pakietu mariadb]
+**************************************************************************************************
+**********************************************************
+changed: [gdynia]
+changed: [krakow]
+TASK [informacje o RAM]
+**************************************************************************************************
+********************************************************************
+skipping: [gdynia]
+skipping: [krakow]
+TASK [informacje o distro]
+**************************************************************************************************
+*****************************************************************
+skipping: [gdynia]
+skipping: [krakow]
+PLAY RECAP
+**************************************************************************************************
+*********************************************************************************
+min_ram_mb: 200
+supported_distros:
+- Debian
+- RedHat
+- CentOS
+ANSIBLE - zeszyt ćwiczeń
+69
+gdynia : ok=2 changed=1 unreachable=0 failed=0 skipped=2
+rescued=0 ignored=0
+krakow : ok=2 changed=1 unreacha
