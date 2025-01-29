@@ -1,0 +1,174 @@
+Ćwiczenie 4 - Statusy zadań
+Kroki wstępne: Zresetuj maszyny gdynia i krakow.
+Katalog roboczy: ~/ansible-tasks-status
+Cel: Przegląd opcji ansible pod kątem obsługi statusów zadań..
+Opis: Stwórz zadania, które będą zwracać różne statusy (failed=1,
+changed=1) i zobacz jak działają takie opcje jak:
+Ignore_errors, changed_when, failed_when
+1. Stwórz playbooka, zawierającego dwa zadania realizowane na maszynie gdynia
+- instalacja pakietu screen i wyświetlenie jakiegokolwiek napisu:
+2. Uruchom i sprawdź czy oba zadania zostały wykonane:
+---
+- name: Testowanie taskow
+hosts: gdynia
+vars:
+package: screen
+tasks:
+- name: instalacja pakietu {{ package }}
+yum:
+name: "{{ package }}"
+state: latest
+- name: kolejne zadanie
+debug:
+msg: "Kolejne zadanie zostalo uruchomione"
+[user@warszawa ansible-tasks-status]$ ansible-playbook ./tasks-status.yml
+PLAY [Testowanie taskow]
+**************************************************************************************************
+*******************************************************************
+TASK [Gathering Facts]
+ANSIBLE - zeszyt ćwiczeń
+78
+**************************************************************************************************
+*********************************************************************
+ok: [gdynia]
+TASK [instalacja pakietu screen]
+**************************************************************************************************
+***********************************************************
+ok: [gdynia]
+TASK [kolejne zadanie]
+**************************************************************************************************
+*********************************************************************
+ok: [gdynia] => {
+"msg": "Kolejne zadanie zostalo uruchomione"
+}
+PLAY RECAP
+**************************************************************************************************
+*********************************************************************************
+gdynia : ok=3 changed=0 unreachable=0 failed=0 skipped=0
+rescued=0 ignored=0
+3. Zmodyfikuj nazwę pakietu z “screen” na “scren” i przetestuj działanie playbooka
+ponownie. Taki pakiet nie istnieje i zadanie zostanie wykonane z błędem. Kolejne
+zadanie (wyświetlające napis) nie zostanie wykonane. Play zakończy działanie.
+(...)
+vars:
+package: scren
+(...)
+[user@warszawa ansible-tasks-status]$ ansible-playbook ./tasks-status.yml
+PLAY [Testowanie taskow]
+**************************************************************************************************
+*******************************************************************
+TASK [Gathering Facts]
+**************************************************************************************************
+*********************************************************************
+ANSIBLE - zeszyt ćwiczeń
+79
+4. Dodaj do zadania instalującego pakiet, opcję ignore_errors:
+5. Przetestuj ponownie - mimo błędu play nie powinien przerywać wykonywania
+kolejnych zadań.
+ok: [gdynia]
+TASK [instalacja pakietu scren]
+**************************************************************************************************
+************************************************************
+fatal: [gdynia]: FAILED! => {"changed": false, "msg": "No package matching 'scren'
+found available, installed or updated", "rc": 126, "results": ["No package matching
+'scren' found available, installed or updated"]}
+PLAY RECAP
+**************************************************************************************************
+*********************************************************************************
+gdynia
+rescued=0
+: ok=1 changed=0
+ignored=0
+unreachable=0 failed=1 skipped=0
+tasks:
+- name: instalacja pakietu {{ package }}
+yum:
+name: "{{ package }}"
+state: latest
+ignore_errors: true
+[user@warszawa ansible-tasks-status]$ ansible-playbook ./tasks-status.yml
+PLAY [Testowanie taskow]
+**************************************************************************************************
+*******************************************************************
+TASK [Gathering Facts]
+**************************************************************************************************
+*********************************************************************
+ok: [gdynia]
+TASK [instalacja pakietu scren]
+ANSIBLE - zeszyt ćwiczeń
+80
+6. Stwórz nowego playbooka, który na hoście gdynia wykonuje komendę “whoami”.
+Po uruchomieniu zweryfikuj, że status jest changed=1 (moduł shell gdy z
+sukcesem wykona zadanie zawsze zwraca status changed=1)
+**************************************************************************************************
+************************************************************
+fatal: [gdynia]: FAILED! => {"changed": false, "msg": "No package matching 'scren'
+found available, installed or updated", "rc": 126, "results": ["No package matching
+'scren' found available, installed or updated"]}
+...ignoring
+TASK [kolejne zadanie]
+**************************************************************************************************
+*********************************************************************
+ok: [gdynia] => {
+"msg": "Kolejne zadanie zostalo uruchomione"
+}
+PLAY RECAP
+**************************************************************************************************
+*********************************************************************************
+gdynia
+rescued=0
+: ok=3 changed=0
+ignored=1
+unreachable=0 failed=0 skipped=0
+---
+- name: Testowanie taskow
+hosts: gdynia
+tasks:
+- name: Sprawdz kim jestes
+shell: "whoami"
+[user@warszawa ansible-tasks-status]$ ansible-playbook ./tasks-status2.yml
+PLAY [Testowanie taskow]
+**************************************************************************************************
+*******************************************************************
+TASK [Gathering Facts]
+**************************************************************************************************
+*********************************************************************
+ANSIBLE - zeszyt ćwiczeń
+81
+7. Dodaj warunek changed_when i przetestuj ponownie. Tym razem status
+changed powinien być ustawiony na 0
+[user@warszawa ansible-tasks-status]$ cat tasks-status2.yml
+---
+- name: Testowanie taskow
+hosts: gdynia
+tasks:
+- name: Sprawdz kim jestes
+shell: "whoami"
+changed_when: false
+[user@warszawa ansible-tasks-status]$ ansible-playbook ./tasks-status2.yml
+PLAY [Testowanie taskow]
+**************************************************************************************************
+*******************************************************************
+TASK [Gathering Facts]
+**************************************************************************************************
+*********************************************************************
+ok: [gdynia]
+TASK [Sprawdz kim jestes]
+**************************************************************************************************
+******************************************************************
+ok: [gdynia]
+PLAY RECAP
+ok: [gdynia]
+TASK [Sprawdz kim jestes]
+**************************************************************************************************
+******************************************************************
+changed: [gdynia]
+PLAY RECAP
+**************************************************************************************************
+*********************************************************************************
+gdynia
+rescued=0
+: ok=2 changed=1 unreachable=0
+ignored=0
+failed=0 skipped=0
+A
