@@ -1,18 +1,12 @@
-PLAY [Instalacja i konfiguracja vsftpd] *****************************************************
 
-TASK [Gathering Facts] **********************************************************************
-fatal: [gdansk]: UNREACHABLE! => {"changed": false, "msg": "Failed to connect to the host via                                                                                                 ssh: kex_exchange_identification: Connection closed by remote host", "unreachable": true}
-ok: [poznan]
+[devops@base ansible_playbooks]$ ansible-playbook mariadb_when.yml
+[WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit
+localhost does not match 'all'
+[WARNING]: Could not match supplied host pattern, ignoring: servers
 
-TASK [Instalacja vsftpd] ********************************************************************
-changed: [poznan]
+PLAY [Instalacja serwera MariaDB na hostach spełniających warunki] **************************
+skipping: no hosts matched
 
-TASK [Uruchomienie i włączenie vsftpd przy starcie] *****************************************
-changed: [poznan]
+PLAY RECAP **********************************************************************************
 
-TASK [Konfiguracja firewalld - dodanie usługi FTP] ******************************************
-ERROR! The requested handler 'Restart firewalld' was not found in either the main handlers list nor in the listening handlers list
-
-
-
-
+[devops@base ansible_playbooks]$
