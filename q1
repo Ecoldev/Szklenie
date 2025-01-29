@@ -61,3 +61,64 @@ ories-ansible
 1. Stwórz katalog inventory (istniejący plik inventory nazwij inventory_static i
 umieść w tym katalogu). Dodatkowo sprawdź, że statyczne inventory cały czas
 działa np. odpytaj się o host g
+
+# Let's create a file with the answers to the quiz and exercise
+
+answers = """
+Ćwiczenie 2 - QUIZ - Ansible-galaxy
+
+PYTANIE 1:
+Wydajesz komendę zdefiniowaną jak poniżej. Jak musi wyglądać zawartość pliku, aby rola zainstalowała się z pliku /test.tar?
+ansible-galaxy install -r requirements.yml -p roles
+
+Odpowiedź B:
+- src: file:///test.tar
+  name: test
+
+PYTANIE 2:
+Czasami poniższa komenda nie działa gdy nie ma dostępu do Internetu, jakiej opcji użyć w takim przypadku?
+ansible-galaxy init rola
+
+Odpowiedź B:
+--offline
+
+PYTANIE 3:
+Jak nazywa się moduł, który pozwala używać roli w play’u?
+
+Odpowiedź B:
+include_role
+
+
+Rozdział 8 - Dodatkowe funkcjonalności i troubleshooting
+Ćwiczenie 1 - Dynamic inventory
+
+Kroki:
+
+1. Stworzenie katalogu inventory:
+   mkdir ~/ansible-dynamic-inventory/inventory
+   mv ~/ansible-dynamic-inventory/inventory ~/ansible-dynamic-inventory/inventory/inventory_static
+
+2. Sprawdzenie działania statycznego inventory:
+
+   ansible -i ~/ansible-dynamic-inventory/inventory/inventory_static all -m ping
+
+3. Skonfiguruj dynamiczne inventory:
+
+   - Skrypt PHP do dynamicznego inventory znajduje się w artykule: 
+     https://www.jeffgeerling.com/blog/creating-custom-dynamic-inventories-ansible
+   - Skrypt generuje plik JSON z dynamiczną listą hostów.
+
+4. Testowanie dynamicznego inventory:
+
+   ansible -i dynamic_inventory.py all -m ping
+
+"""
+
+# Write the answers to a file
+file_path = "/mnt/data/ansible_quiz_answers.txt"
+with open(file_path, "w") as file:
+    file.write(answers)
+
+file_path
+
+
