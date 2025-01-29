@@ -20,5 +20,5 @@ poznan
 ansible-playbook -i inventory.ini install_packages.yml
 ansible-playbook -i inventory.ini install_packages.yml --ask-become-pass
 
-
+ansible-playbook -i inventory.ini install_packages.yml --ask-become-pass
 
