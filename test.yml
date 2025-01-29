@@ -1,0 +1,13 @@
+---
+- name: Testowanie tasków
+  hosts: all
+  vars:
+    package: screen
+  tasks:
+    - name: instalacja pakietu {{ package }}
+      yum:
+        name: "{{ package }}"
+        state: latest
+    - name: kolejne zadanie
+      debug:
+        msg: "Kolejne zadanie zostało uruchomione"
