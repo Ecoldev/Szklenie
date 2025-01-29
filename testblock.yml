@@ -1,0 +1,19 @@
+---
+- name: Testowanie tasków
+  hosts: gdynia
+  vars:
+    package: scren
+  tasks:
+    - block:
+        - name: instalacja pakietu
+          yum:
+            name: "{{ package }}"
+            state: latest
+      rescue:
+        - name: informacja1
+          debug:
+            msg: "Uruchamiam się tylko ratunkowo, jak wcześniejsze zadanie z bloku zakończy się błędem"
+      always:
+        - name: informacja2
+          debug:
+            msg: "A ja uruchamiam się zawsze!"
