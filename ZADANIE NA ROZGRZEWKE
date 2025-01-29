@@ -2,7 +2,7 @@ ZADANIE NA ROZGRZEWKE
 
 Zadanie ad-hoc
 3. Znajdz wszystkie pliki wieksze lub rowne 1MB w katalogu /var/log - moduł find
-
+find /var/log -type f -size +1M
 ZADANIE 1
 
 Stworz playbooka uzywajac osobnych PLAY:
