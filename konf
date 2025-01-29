@@ -1,0 +1,24 @@
+mkdir -p ansible_playbooks/group_vars
+cd ansible_playbooks
+touch inventory.ini install_packages.yml
+cd group_vars
+touch all.yml gdansk.yml poznan.yml
+
+
+
+
+[gdansk]
+gdansk
+
+[poznan]
+poznan
+
+[all:children]
+gdansk
+poznan
+
+ansible-playbook -i inventory.ini install_packages.yml
+ansible-playbook -i inventory.ini install_packages.yml --ask-become-pass
+
+
+
