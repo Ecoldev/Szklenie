@@ -14,7 +14,7 @@
         state: started
 
     - name: Konfiguracja firewalld - dodanie usługi FTP
-      ansible.builtin.firewalld:
+      ansible.posix.firewalld:
         service: ftp
         permanent: yes
         state: enabled
