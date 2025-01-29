@@ -1,0 +1,34 @@
+ZADANIE NA ROZGRZEWKE
+
+Zadanie ad-hoc
+3. Znajdz wszystkie pliki wieksze lub rowne 1MB w katalogu /var/log - moduł find
+
+ZADANIE 1
+
+Stworz playbooka uzywajac osobnych PLAY:
+
+1. Na gdansku zainstaluj paczki: mariadb, httpd, php
+2. Na poznaniu zainstaluj paczki: targetcli, iscsi-initiator-utils
+3. Na wszystkich hostach zainstaluj paczki:
+	- policycoreutils-python-utils
+	- epel-release
+
+Wykorzystaj petle i zmienne na 2 sposoby
+
+ZADANIE 2
+
+Stworz playbooka:
+    1. Zainstaluj i uruchom serwis vsftpd
+	Serwis musi uruchamiac automatycznie po restarcie systemu
+    2. Skonfiguruj firewalld - service ftp
+    3. Do katalogu /var/ftp/pub wrzuc plik1 i plik2 (wykorzystaj petle)
+    4. Zmien jedna linie w pliku /etc/vsftpd/vsftpd.conf:
+        anonymous_enable=NO
+        anonymous_enable=YES
+    5. Restart serwisu vsftpd
+
+
+Przydatne moduły:   dnf, systemd, firewalld, copy, lineinfile
+
+
+
