@@ -1,0 +1,83 @@
+Ćwiczenie 5 - Bloki w zadaniach
+Kroki wstępne: Zresetuj maszyny gdynia i krakow.
+Katalog roboczy: ~/ansible-tasks-block
+Cel: Tworzenie bloków ratunkowych (rescue) w zadaniach
+Opis: Stworzenie play’a który uruchamia zadania w zależności od
+statusu wcześniejszego zadania lub grupy zadań lub bez wględuna
+ten status.
+1. Stwórz playbooka, zawierającego bloki. Zadanie główne instalacja pakietu scren
+(literówka celowa) oraz sekcje rescue i always. Zobacz jakie zadania
+się wykonają i czy playbook przerwie wykonywanie działań czy będzie
+procesował się dalej. Play będzie procesowany, gdy zadanie z sekcji rescue
+wykona się prawidłowo.
+---
+- name: Testowanie taskow
+hosts: gdynia
+vars:
+package: scren
+tasks:
+- block:
+- name: instalacja pakietu
+yum:
+name: "{{ package }}"
+state: latest
+rescue:
+- name: informacja1
+debug:
+msg: "Uruchamiam sie tylko ratunkowo, jak wczesniejsze zadanie z bloku
+zakonczy sie bledem"
+always:
+- name: informacja2
+debug:
+msg: "A ja uruchamiam sie zawsze!"
+ANSIBLE - zeszyt ćwiczeń
+85
+2. Przetestuj:
+[user@warszawa ansible-tasks-block]$ ansible-playbook ./tasks-block.yml
+PLAY [Testowanie taskow]
+**************************************************************************************************
+*******************************************************************
+TASK [Gathering Facts]
+**************************************************************************************************
+*********************************************************************
+ok: [gdynia]
+TASK [instalacja pakietu]
+**************************************************************************************************
+******************************************************************
+fatal: [gdynia]: FAILED! => {"changed": false, "msg": "No package matching 'scren'
+found available, installed or updated", "rc": 126, "results": ["No package matching
+'scren' found available, installed or updated"]}
+TASK [informacja1]
+**************************************************************************************************
+*************************************************************************
+ok: [gdynia] => {
+"msg": "Uruchamiam sie tylko ratunkowo, jak wczesniejsze zadanie z bloku
+zakonczy sie bledem"
+}
+TASK [informacja2]
+**************************************************************************************************
+*************************************************************************
+ok: [gdynia] => {
+"msg": "A ja uruchamiam sie zawsze!"
+}
+TASK [kolejne zadanie]
+**************************************************************************************************
+- name: kolejne zadanie
+debug:
+msg: "Kolejne zadanie zostalo uruchomione"
+ANSIBLE - zeszyt ćwiczeń
+86
+*********************************************************************
+ok: [gdynia] => {
+"msg": "Kolejne zadanie zostalo uruchomione"
+}
+PLAY RECAP
+**************************************************************************************************
+*********************************************************************************
+gdynia : ok=4 changed=0 unreachable=0 failed=0 skipped=0
+rescued=1 ignored=0
+ANSIBLE - zeszyt ćwiczeń
+87
+Rozdział 7 - Role
+Ćwiczenie 1 - Tworzenie roli
+Kroki wstępne: Zresetuj maszyny gdynia
