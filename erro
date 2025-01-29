@@ -8,3 +8,6 @@ The offending line appears to be:
 
     - name: Konfiguracja firewalld - dodanie usługi FTP
       ^ here
+
+
+ansible-galaxy collection install ansible.posix
