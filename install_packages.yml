@@ -2,40 +2,31 @@
   hosts: gdansk
   become: yes
   tasks:
-    - name: Instalacja pakietów
+    - name: Instalacja pakietów dla Gdańska
       ansible.builtin.dnf:
-        name: 
-          - mariadb
-          - httpd
-          - php
+        name: "{{ packages }}"
         state: present
 
 - name: Instalacja pakietów na Poznaniu
   hosts: poznan
   become: yes
   tasks:
-    - name: Instalacja pakietów
+    - name: Instalacja pakietów dla Poznania
       ansible.builtin.dnf:
-        name:
-          - targetcli
-          - iscsi-initiator-utils
+        name: "{{ packages }}"
         state: present
 
 - name: Instalacja pakietów na wszystkich hostach
   hosts: all
   become: yes
-  vars:
-    common_packages:
-      - policycoreutils-python-utils
-      - epel-release
   tasks:
-    - name: Instalacja pakietów - metoda 1
+    - name: Instalacja pakietów wspólnych - metoda 1 (cała lista)
       ansible.builtin.dnf:
         name: "{{ common_packages }}"
         state: present
 
-    - name: Instalacja pakietów - metoda 2
-      loop: "{{ common_packages }}"
+    - name: Instalacja pakietów wspólnych - metoda 2 (pętla)
       ansible.builtin.dnf:
         name: "{{ item }}"
         state: present
+      loop: "{{ common_packages }}"
