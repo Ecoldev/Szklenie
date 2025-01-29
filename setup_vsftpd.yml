@@ -1,0 +1,47 @@
+- name: Instalacja i konfiguracja vsftpd
+  hosts: all
+  become: yes
+  tasks:
+    - name: Instalacja vsftpd
+      ansible.builtin.dnf:
+        name: vsftpd
+        state: present
+
+    - name: Uruchomienie i włączenie vsftpd przy starcie
+      ansible.builtin.systemd:
+        name: vsftpd
+        enabled: yes
+        state: started
+
+    - name: Konfiguracja firewalld - dodanie usługi FTP
+      ansible.builtin.firewalld:
+        service: ftp
+        permanent: yes
+        state: enabled
+      notify: Restart firewalld
+
+    - name: Utworzenie plików w /var/ftp/pub
+      ansible.builtin.copy:
+        content: "To jest plik {{ item }}"
+        dest: "/var/ftp/pub/{{ item }}"
+        mode: '0644'
+      loop:
+        - plik1
+        - plik2
+
+    - name: Modyfikacja pliku konfiguracyjnego vsftpd
+      ansible.builtin.lineinfile:
+        path: /etc/vsftpd/vsftpd.conf
+        regexp: '^anonymous_enable='
+        line: 'anonymous_enable=YES'
+
+    - name: Restart vsftpd
+      ansible.builtin.systemd:
+        name: vsftpd
+        state: restarted
+
+  handlers:
+    - name: Restart firewalld
+      ansible.builtin.systemd:
+        name: firewalld
+        state: reloaded
