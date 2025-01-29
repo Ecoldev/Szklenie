@@ -1,13 +1,17 @@
-ERROR! We were unable to read either as JSON nor YAML, these are the errors we got from each:
-JSON: Expecting value: line 1 column 3 (char 2)
+PLAY [Instalacja i konfiguracja vsftpd] *****************************************************
 
-Syntax Error while loading YAML.
-  mapping values are not allowed in this context
+TASK [Gathering Facts] **********************************************************************
+fatal: [gdansk]: UNREACHABLE! => {"changed": false, "msg": "Failed to connect to the host via                                                                                                 ssh: kex_exchange_identification: Connection closed by remote host", "unreachable": true}
+ok: [poznan]
 
-The error appears to be in '/home/devops/ansible_playbooks/install_vsftpd.yml': line 3, column 7, but may
-be elsewhere in the file depending on the exact syntax problem.
+TASK [Instalacja vsftpd] ********************************************************************
+changed: [poznan]
 
-The offending line appears to be:
+TASK [Uruchomienie i włączenie vsftpd przy starcie] *****************************************
+changed: [poznan]
+
+TASK [Konfiguracja firewalld - dodanie usługi FTP] ******************************************
+ERROR! The requested handler 'Restart firewalld' was not found in either the main handlers list nor in the listening handlers list
 
 
 - name: Instalacja i konfiguracja vsftpd
