@@ -29,3 +29,6 @@ ansible-playbook -i inventory.ini install_packages.yml --ask-become-pass
 echo "To jest plik 1" > ansible_playbooks/files/plik1.txt
 echo "To jest plik 2" > ansible_playbooks/files/plik2.txt
 ansible-playbook -i inventory.ini install_vsftpd.yml --ask-become-pass
+ansible-playbook -i inventory.ini setup_rsyslog.yml --ask-become-pass
+
+
