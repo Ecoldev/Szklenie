@@ -1,0 +1,29 @@
+PLAYBOOK NR 1
+
+W inventory stworz 2 grupy: 
+log_servers - nalezy do niej katowice
+log_clients - naleza do niej poznan i gdansk
+
+
+Napisz playbooka:
+
+Na wszystkich maszynach zainstaluj i uruchom serwis rsyslog
+
+Na katowice wlacz przyjmowanie logow z gdanska i poznania
+w pliku /etc/rsyslog.conf odkomentuj linie:
+
+#module(load="imudp") # needs to be done just once
+#input(type="imudp" port="514")
+
+Skonfiguruj firewalla - service syslog (port 514-udp)
+
+
+Na poznaniu i gdansku trzeba dodac do /etc/rsyslog.conf linie:
+
+    *.*  @katowice
+
+Po zmianie w /etc/rsyslog.conf zrestartuj demona (tylko jesli jest to konieczne)
+
+
+Zeby sprawdzic poprawne dzialanie na katowicach wydaj komende :
+tail -f /var/log/messages
