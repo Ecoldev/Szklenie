@@ -1,4 +1,3 @@
----
 - name: Instalacja i konfiguracja vsftpd
   hosts: all
   become: yes
@@ -21,41 +20,31 @@
         state: enabled
       notify: Restart firewalld
 
-    - name: Utworzenie plików w /var/ftp/pub
-      ansible.builtin.copy:
-        content: "To jest plik {{ item }}"
-        dest: "/var/ftp/pub/{{ item }}"
-        mode: '0644'
-      loop:
-        - plik1
-        - plik2
+    - name: Sprawdzenie, czy plik konfiguracyjny istnieje
+      stat:
+        path: /etc/vsftpd/vsftpd.conf
+      register: vsftpd_conf
 
-    - name: Tworzenie kopii zapasowej pliku konfiguracyjnego
+    - name: Przywrócenie domyślnego pliku konfiguracyjnego, jeśli nie istnieje
+      ansible.builtin.copy:
+        src: /usr/share/doc/vsftpd*/vsftpd.conf
+        dest: /etc/vsftpd/vsftpd.conf
+        remote_src: yes
+      when: not vsftpd_conf.stat.exists
+
+    - name: Kopia zapasowa pliku konfiguracyjnego przed zmianami
       ansible.builtin.copy:
         src: /etc/vsftpd/vsftpd.conf
         dest: /etc/vsftpd/vsftpd.conf.bak
         remote_src: yes
+      when: vsftpd_conf.stat.exists
 
     - name: Modyfikacja pliku konfiguracyjnego vsftpd
       ansible.builtin.lineinfile:
         path: /etc/vsftpd/vsftpd.conf
         regexp: '^anonymous_enable='
         line: 'anonymous_enable=YES'
-      register: vsftpd_config
-
-    - name: Restart vsftpd (tylko jeśli konfiguracja się zmieniła)
-      ansible.builtin.systemd:
-        name: vsftpd
-        state: restarted
-      when: vsftpd_config.changed
-
-    - name: Przywrócenie poprzedniego pliku konfiguracyjnego w razie problemów
-      ansible.builtin.copy:
-        src: /etc/vsftpd/vsftpd.conf.bak
-        dest: /etc/vsftpd/vsftpd.conf
-        remote_src: yes
       notify: Restart vsftpd
-      when: vsftpd_config.failed
 
   handlers:
     - name: Restart firewalld
