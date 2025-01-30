@@ -1,0 +1,34 @@
+---
+- name: Tworzenie użytkowników
+  hosts: all
+  become: yes
+  vars_files:
+    - grupa.yml  # Plik zewnętrzny zawierający zmienną 'grupa'
+  tasks:
+
+    - name: Sprawdzenie, czy grupa {{ grupa }} istnieje
+      command: getent group {{ grupa }}
+      register: group_check
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Informacja o braku grupy
+      debug:
+        msg: "Niestety brak grupy {{ grupa }}"
+      when: group_check.rc != 0
+
+    - name: Tworzenie użytkowników
+      user:
+        name: "{{ item }}"
+        groups: "{{ grupa }}"
+        append: yes
+        state: present
+      loop:
+        - krzysztof
+        - leszek
+        - daniel
+      ignore_errors: yes  # Zapobiega przerwaniu playbooka, jeśli grupa nie istnieje
+
+    - name: Końcowa wiadomość
+      debug:
+        msg: "Try harder ;)"
