@@ -8,6 +8,8 @@ ansible-playbook ./tasks-block.yml
 mkdir -p ansible_playbooks/files
 echo "To jest plik 1" > ansible_playbooks/files/plik1.txt
 echo "To jest plik 2" > ansible_playbooks/files/plik2.txt
+ansible-playbook ./ftp-vars.yml
+ftp krakow
 
 ansible-playbook -i inventory.ini create_users.yml --ask-become-pass
 
