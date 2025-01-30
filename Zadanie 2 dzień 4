@@ -1,0 +1,26 @@
+PLAYBOOK NR 2
+
+Stworz playbooka ktory nie konczy sie jako FAILED:
+
+Tworzacego 3 userow krzysztof, leszek i daniel
+wszyscy maja nalezec do grupy ktora jest okreslona w zewnetrznym pliku jako zmienna 'grupa'
+
+W razie gdy nie ma w systemie grupy o takiej nazwie jak w zmiennej playbook powinien wyswietlic komunikat
+"Niestety brak grupy <NAZWA_GRUPY>"
+
+Niezaleznie od tego czy userzy zostana dodani do grupy czy nie na koncu playbooka powinien sie pojawic komunikat
+"Try harder ;)"
+
+W playbooku nie zamieszczaj taska z dodawaniem grupy
+
+Przetestuj playbooka w sytuacji gdy grupa istnieje jak i nie istnieje
+W razie potrzeby w systemie jest grupa 'student'
+
+
+
+
+###################################################
+Popraw wczorajszego playbooka z FTP
+Spróbuj zaimplementowac wdrozenie vsftpd tak by:
+     - restart serwisu vsftpd wykonywal sie tylko wtedy kiedy to konieczne
+     - w razie problemow odtworzyc poprzedni plik konfiguracyjny /etc/vsftpd/vsftpd.conf
