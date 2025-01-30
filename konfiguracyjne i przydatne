@@ -1,4 +1,4 @@
-mkdir -p ansible_playbooks/group_vars
+j ni mkdir -p ansible_playbooks/group_vars
 cd ansible_playbooks
 touch inventory.ini install_packages.yml
 cd group_vars
@@ -49,5 +49,7 @@ ansible-playbook -i inventory.ini setup_rsyslog.yml --ask-become-pass
 
 na ktawicach 
 tail -f /var/log/messages
+
+sudo rm /etc/vsftpd/vsftpd.conf
 
 
