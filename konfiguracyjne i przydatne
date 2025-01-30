@@ -39,7 +39,7 @@ ansible-playbook mariadb-when.yml
 
 ansible-playbook -i inventory.ini install_packages.yml
 ansible-playbook -i inventory.ini install_packages.yml --ask-become-pass
-
+ansible-playbook -i inventory.ini new_vsftpd.yml --ask-become-pass
 ansible-playbook -i inventory.ini install_packages.yml --ask-become-pass
 
 echo "To jest plik 1" > ansible_playbooks/files/plik1.txt
