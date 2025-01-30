@@ -4,7 +4,7 @@ touch inventory.ini install_packages.yml
 cd group_vars
 touch all.yml gdansk.yml poznan.yml
 ansible-playbook ./tasks-block.yml
-
+ansible-playbook ./ftp-vars-gdynia.yml
 mkdir -p ansible_playbooks/files
 echo "To jest plik 1" > ansible_playbooks/files/plik1.txt
 echo "To jest plik 2" > ansible_playbooks/files/plik2.txt
