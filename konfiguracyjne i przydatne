@@ -38,4 +38,7 @@ echo "To jest plik 2" > ansible_playbooks/files/plik2.txt
 ansible-playbook -i inventory.ini install_vsftpd.yml --ask-become-pass
 ansible-playbook -i inventory.ini setup_rsyslog.yml --ask-become-pass
 
+na ktawicach 
+tail -f /var/log/messages
+
 
