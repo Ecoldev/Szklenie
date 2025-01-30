@@ -25,12 +25,21 @@
         path: /etc/vsftpd/vsftpd.conf
       register: vsftpd_conf
 
+    - name: Znalezienie domyślnego pliku konfiguracyjnego
+      find:
+        paths:
+          - /usr/share/doc/vsftpd/
+          - /usr/share/doc/vsftpd-*/  # Dla różnych wersji pakietu
+        patterns: "vsftpd.conf"
+      register: default_vsftpd_conf
+      when: not vsftpd_conf.stat.exists
+
     - name: Przywrócenie domyślnego pliku konfiguracyjnego, jeśli nie istnieje
       ansible.builtin.copy:
-        src: /usr/share/doc/vsftpd*/vsftpd.conf
+        src: "{{ default_vsftpd_conf.files[0].path }}"
         dest: /etc/vsftpd/vsftpd.conf
         remote_src: yes
-      when: not vsftpd_conf.stat.exists
+      when: not vsftpd_conf.stat.exists and default_vsftpd_conf.matched > 0
 
     - name: Kopia zapasowa pliku konfiguracyjnego przed zmianami
       ansible.builtin.copy:
