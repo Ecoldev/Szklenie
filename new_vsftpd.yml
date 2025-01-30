@@ -1,3 +1,4 @@
+---
 - name: Instalacja i konfiguracja vsftpd
   hosts: all
   become: yes
@@ -20,48 +21,43 @@
         state: enabled
       notify: Restart firewalld
 
-    - name: Sprawdzenie, czy plik konfiguracyjny istnieje
-      stat:
-        path: /etc/vsftpd/vsftpd.conf
-      register: vsftpd_conf
-
-    - name: Znalezienie domyślnego pliku konfiguracyjnego
-      find:
-        paths:
-          - /usr/share/doc/vsftpd/
-          - /usr/share/doc/vsftpd-*/  # Dla różnych wersji pakietu
-        patterns: "vsftpd.conf"
-      register: default_vsftpd_conf
-      when: not vsftpd_conf.stat.exists
-
-    - name: Przywrócenie domyślnego pliku konfiguracyjnego, jeśli nie istnieje
+    - name: Utworzenie plików w /var/ftp/pub
       ansible.builtin.copy:
-        src: "{{ default_vsftpd_conf.files[0].path }}"
-        dest: /etc/vsftpd/vsftpd.conf
-        remote_src: yes
-      when: not vsftpd_conf.stat.exists and default_vsftpd_conf.matched > 0
+        content: "To jest plik {{ item }}"
+        dest: "/var/ftp/pub/{{ item }}"
+        mode: '0644'
+      loop:
+        - plik1
+        - plik2
 
-    - name: Kopia zapasowa pliku konfiguracyjnego przed zmianami
+    - name: Tworzenie kopii zapasowej pliku konfiguracyjnego vsftpd, jeśli istnieje
       ansible.builtin.copy:
         src: /etc/vsftpd/vsftpd.conf
-        dest: /etc/vsftpd/vsftpd.conf.bak
+        dest: "/etc/vsftpd/vsftpd.conf.bak"
+        backup: yes
+      when: ansible_facts['os_family'] == "RedHat" and ansible.builtin.stat(path="/etc/vsftpd/vsftpd.conf").stat.exists
+
+    - name: Przywrócenie domyślnego pliku konfiguracyjnego vsftpd.conf, jeśli nie istnieje
+      ansible.builtin.copy:
+        src: /usr/share/doc/vsftpd*/examples/vsftpd.conf
+        dest: /etc/vsftpd/vsftpd.conf
         remote_src: yes
-      when: vsftpd_conf.stat.exists
+      when: not ansible.builtin.stat(path="/etc/vsftpd/vsftpd.conf").stat.exists
 
     - name: Modyfikacja pliku konfiguracyjnego vsftpd
       ansible.builtin.lineinfile:
         path: /etc/vsftpd/vsftpd.conf
         regexp: '^anonymous_enable='
         line: 'anonymous_enable=YES'
-      notify: Restart vsftpd
+
+    - name: Restart vsftpd tylko wtedy, gdy plik konfiguracyjny został zmieniony
+      ansible.builtin.systemd:
+        name: vsftpd
+        state: restarted
+      when: ansible_facts['os_family'] == "RedHat" and ansible.builtin.stat(path="/etc/vsftpd/vsftpd.conf").stat.exists and ansible.builtin.stat(path="/etc/vsftpd/vsftpd.conf").stat.mtime != ansible.builtin.stat(path="/etc/vsftpd/vsftpd.conf.bak").stat.mtime
 
   handlers:
     - name: Restart firewalld
       ansible.builtin.systemd:
         name: firewalld
         state: reloaded
-
-    - name: Restart vsftpd
-      ansible.builtin.systemd:
-        name: vsftpd
-        state: restarted
