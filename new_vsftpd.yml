@@ -3,52 +3,67 @@
   hosts: all
   become: yes
   tasks:
-
     - name: Instalacja vsftpd
-      yum:
+      ansible.builtin.dnf:
         name: vsftpd
         state: present
 
-    - name: Uruchomienie i włączenie vsftpd przy starcie systemu
-      service:
+    - name: Uruchomienie i włączenie vsftpd przy starcie
+      ansible.builtin.systemd:
         name: vsftpd
-        state: started
         enabled: yes
-
-    - name: Tworzenie kopii zapasowej obecnego pliku konfiguracyjnego
-      copy:
-        src: /etc/vsftpd/vsftpd.conf
-        dest: /etc/vsftpd/vsftpd.conf.bak
-        remote_src: yes
-      when: ansible_facts['os_family'] == "RedHat"  # Można dostosować do innych systemów
-
-    - name: Modyfikacja pliku konfiguracyjnego vsftpd
-      copy:
-        src: files/vsftpd.conf  # Plik z nową konfiguracją
-        dest: /etc/vsftpd/vsftpd.conf
-        backup: yes
-      notify: Restart vsftpd
-      register: vsftpd_config
+        state: started
 
     - name: Konfiguracja firewalld - dodanie usługi FTP
-      firewalld:
+      ansible.builtin.firewalld:
         service: ftp
         permanent: yes
         state: enabled
-        immediate: yes
-      when: ansible_facts['os_family'] == "RedHat"
+      notify: Restart firewalld
 
-  handlers:
-    - name: Restart vsftpd
-      service:
+    - name: Utworzenie plików w /var/ftp/pub
+      ansible.builtin.copy:
+        content: "To jest plik {{ item }}"
+        dest: "/var/ftp/pub/{{ item }}"
+        mode: '0644'
+      loop:
+        - plik1
+        - plik2
+
+    - name: Tworzenie kopii zapasowej pliku konfiguracyjnego
+      ansible.builtin.copy:
+        src: /etc/vsftpd/vsftpd.conf
+        dest: /etc/vsftpd/vsftpd.conf.bak
+        remote_src: yes
+
+    - name: Modyfikacja pliku konfiguracyjnego vsftpd
+      ansible.builtin.lineinfile:
+        path: /etc/vsftpd/vsftpd.conf
+        regexp: '^anonymous_enable='
+        line: 'anonymous_enable=YES'
+      register: vsftpd_config
+
+    - name: Restart vsftpd (tylko jeśli konfiguracja się zmieniła)
+      ansible.builtin.systemd:
         name: vsftpd
         state: restarted
       when: vsftpd_config.changed
 
     - name: Przywrócenie poprzedniego pliku konfiguracyjnego w razie problemów
-      copy:
+      ansible.builtin.copy:
         src: /etc/vsftpd/vsftpd.conf.bak
         dest: /etc/vsftpd/vsftpd.conf
         remote_src: yes
       notify: Restart vsftpd
       when: vsftpd_config.failed
+
+  handlers:
+    - name: Restart firewalld
+      ansible.builtin.systemd:
+        name: firewalld
+        state: reloaded
+
+    - name: Restart vsftpd
+      ansible.builtin.systemd:
+        name: vsftpd
+        state: restarted
