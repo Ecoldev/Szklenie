@@ -1,0 +1,74 @@
+---
+- name: Instalacja i konfiguracja rsyslog
+  hosts: all
+  become: yes
+  tasks:
+  
+    - name: Instalacja rsyslog
+      package:
+        name: rsyslog
+        state: present
+
+    - name: Uruchomienie rsyslog i włączenie przy starcie
+      service:
+        name: rsyslog
+        state: started
+        enabled: yes
+
+- name: Konfiguracja serwera logów (Katowice)
+  hosts: log_servers
+  become: yes
+  tasks:
+
+    - name: Odkomentowanie linii w /etc/rsyslog.conf
+      replace:
+        path: /etc/rsyslog.conf
+        regexp: '^#(module\(load="imudp"\) # needs to be done just once)'
+        replace: '\1'
+    
+    - name: Odkomentowanie linii portu UDP w /etc/rsyslog.conf
+      replace:
+        path: /etc/rsyslog.conf
+        regexp: '^#(input\(type="imudp" port="514"\))'
+        replace: '\1'
+    
+    - name: Dodanie reguły firewalld dla syslog
+      firewalld:
+        service: syslog
+        permanent: yes
+        state: enabled
+
+    - name: Restart firewalld
+      service:
+        name: firewalld
+        state: reloaded
+
+    - name: Restart rsyslog po zmianach
+      service:
+        name: rsyslog
+        state: restarted
+
+- name: Konfiguracja klientów logów (Poznań, Gdańsk)
+  hosts: log_clients
+  become: yes
+  tasks:
+
+    - name: Sprawdzenie, czy wpis już istnieje
+      command: grep '@katowice' /etc/rsyslog.conf
+      register: check_rsyslog
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Dodanie konfiguracji logowania do Katowic
+      lineinfile:
+        path: /etc/rsyslog.conf
+        line: '*.*  @katowice'
+        state: present
+      when: check_rsyslog.rc != 0
+      notify: Restart rsyslog
+
+  handlers:
+    - name: Restart rsyslog
+      service:
+        name: rsyslog
+        state: restarted
