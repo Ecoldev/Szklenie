@@ -19,6 +19,13 @@ poznan
 gdansk
 poznan
 
+[log_servers]
+katowice
+
+[log_clients]
+poznan
+gdansk
+
 ansible-playbook mariadb-when.yml
 
 ansible-playbook -i inventory.ini install_packages.yml
