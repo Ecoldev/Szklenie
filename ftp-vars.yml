@@ -1,0 +1,25 @@
+---
+- name: Implementacja serwera vsftpd na serwerze krakow
+  hosts: krakow
+  vars:
+    ftp_package: vsftpd
+    ftp_firewall: ftp
+    ftp_service: vsftpd
+  tasks:
+    - name: Instalacja pakietu {{ ftp_package }}
+      yum:
+        name: "{{ ftp_package }}"
+        state: latest
+
+    - name: Uruchomienie i autostart usługi {{ ftp_service }}
+      service:
+        name: "{{ ftp_service }}"
+        state: started
+        enabled: true
+
+    - name: Konfiguracja firewalla dla usługi {{ ftp_firewall }}
+      firewalld:
+        service: "{{ ftp_firewall }}"
+        permanent: yes
+        state: enabled
+        immediate: true
