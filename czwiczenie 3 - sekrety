@@ -1,0 +1,118 @@
+Ćwiczenie 3 - Sekrety
+Kroki wstępne: Zresetuj maszyny gdynia i krakow.
+Katalog roboczy: ~/ansible-secrets
+Cel: Definiowanie i używanie sekretów
+Opis: Celem ćwiczenia jest:
+- Stworzenie playbooka który zwróci informacje o FQDN, IP i
+ilości RAMu na zdalnych hostach
+- Definiowanie własnych faktów na zdalnych serwerach -
+faktem będzie nazwa pakietu, który instalowany będzie
+poprzez moduł ansible.
+- Analiza dostępnych Magics Vars
+1. Wygeneruj zaszyfrowane hasło “altkom” tworząc tymczasowego użytkownika.
+Zrób to korzystając z konta root na maszynie warszawa.
+2. Stwórz plik password.yml który będzie zaszyfrowany i zawierać będzie zmienną
+pass o zawartości zaszyfrowanego hasła wygenerowane przed chwilą.
+a. Stwórz plik, podczas tworzenia ansible-vault zapytania się jakim hasłem
+chcesz zabezpieczyć plik - użyj hasła altkom.
+[user@warszawa ansible-secrets]$ sudo -i
+[root@warszawa ~]# useradd test
+[root@warszawa ~]# echo altkom | passwd --stdin test
+Changing password for user test.
+passwd: all authentication tokens updated successfully.
+[root@warszawa ~]# tail -n1 /etc/shadow| cut -f2 -d:
+$6$AnCZzn6D$xMtHEfms6YKI6WBsCoaQp6uEW.oHONwC9cbp7.VijeAaNsLPUEBV
+WpMNNtciWXXk2fGsWKI7PGv.ehA4gJVHY1
+[root@warszawa ~]# tail -n1 /etc/shadow| cut -f2 -d: > /tmp/password
+[root@warszawa ~]# userdel -r test
+ANSIBLE - zeszyt ćwiczeń
+56
+b. Zawartość pliku powinna wyglądać jak poniżej. Uwaga: jest to jedna linia.
+3. Sprawdź, że plik jest zaszyfrowany:
+4. Zweryfikuj odkodowaną zawartość pliku:
+[user@warszawa ansible-secrets]$ ansible-vault create password.yml
+New Vault password:
+Confirm New Vault password:
+pw:
+'$6$AnCZzn6D$xMtHEfms6YKI6WBsCoaQp6uEW.oHONwC9cbp7.VijeAaNsLPUEBV
+WpMNNtciWXXk2fGsWKI7PGv.ehA4gJVHY1'
+[user@warszawa ansible-secrets]$ cat password.yml
+$ANSIBLE_VAULT;1.1;AES256
+396461323665613765636563363139323637613034646531386333333438666630316
+36464656635
+3565366365356136643465333232343065396236346663630a3339653363393964343
+46630656538
+636430303238323261383232386431396465343331613838616461326563643064663
+93535306339
+6433643830393233370a3730656263376432343833633831303861656364646561653
+56262616164
+643930636663373366313635346464303061326262613536333165313830663137316
+13266386362
+383937326463313765373231346664613163363932323634643161316338383161373
+53437643037
+393439303038646232363539336533303264613736343065333934356466373231383
+13837653933
+356639393961663362303933646333326436356231353030653563653964333133643
+36335393061
+33346365396432613564333637363133646438303837333238643034383762616432
+[user@warszawa ansible-secrets]$ ansible-vault view ./password.yml
+Vault password:
+pw:
+'$6$AnCZzn6D$xMtHEfms6YKI6WBsCoaQp6uEW.oHONwC9cbp7.VijeAaNsLPUEBV
+WpMNNtciWXXk2fGsWKI7PGv.ehA4gJVHY1'
+ANSIBLE - zeszyt ćwiczeń
+57
+5. Stwórz playbook, który na serwerach z grupy servers będzie tworzyć z
+wykorzystaniem modułu user użytkownika secretuser a hasło będzie pobierane
+ze zmiennej pw zdefiniowanej w zaszyfrowanym pliku password.yml
+6. Uruchom playbooka z opcją --ask-vault-pass i wpisz hasło gdy zostaniesz o nie
+poproszony:
+[user@warszawa ansible-secrets]$ ansible-playbook ./user.yml --ask-vault-pass
+Vault password:
+PLAY [Stworzenie usera z haslem z sekretow]
+**************************************************************************************************
+************************************************
+TASK [Gathering Facts]
+**************************************************************************************************
+*********************************************************************
+ok: [gdynia]
+ok: [krakow]
+TASK [Stworz usera]
+**************************************************************************************************
+************************************************************************
+changed: [gdynia]
+changed: [krakow]
+PLAY RECAP
+**************************************************************************************************
+*********************************************************************************
+gdynia : ok=2 changed=1 unreachable=0 failed=0 skipped=0
+---
+- name: Stworzenie usera z haslem z sekretow
+hosts: servers
+vars_files:
+- password.yml
+tasks:
+- name: Stworz usera
+user:
+name: secretuser
+password: "{{ pw }}"
+ANSIBLE - zeszyt ćwiczeń
+58
+7. Zweryfikuj nowo utworzonych użytkowników
+rescued=0
+krakow
+rescued=0
+ignored=0
+: ok=2 changed=1
+ignored=0
+unreachable=0 failed=0 skipped=0
+[user@warszawa ~]$ ssh secretuser@gdynia
+[secretuser@gdynia ~]$ exit
+logout
+Connection to gdynia closed.
+[user@warszawa ~]$ ssh secretuser@krakow
+secretuser@krakow's password:
+[secretuser@krakow ~]$ exit
+logout
+Connection to krakow closed.
+ANS
