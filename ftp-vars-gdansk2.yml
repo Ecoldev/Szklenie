@@ -1,0 +1,24 @@
+---
+- name: Implementacja serwera vsftpd na serwerze gdynia
+  hosts: gdynia
+  tasks:
+    - name: Ustaw zmienne
+      include_vars: vars.yml
+
+    - name: Instalacja pakietu {{ ftp_package }}
+      yum:
+        name: "{{ ftp_package }}"
+        state: latest
+
+    - name: Uruchomienie i autostart usługi {{ ftp_service }}
+      service:
+        name: "{{ ftp_service }}"
+        state: started
+        enabled: true
+
+    - name: Konfiguracja firewalla dla usługi {{ ftp_firewall }}
+      firewalld:
+        service: "{{ ftp_firewall }}"
+        permanent: yes
+        state: enabled
+        immediate: true
