@@ -1,40 +1,27 @@
 
-[devops@base ansible_playbooks]$ ansible-playbook -i inventory.ini install_vsftpd.yml --ask-become-pass
-BECOME password:
-[WARNING]: Found both group and host with same name: poznan
-[WARNING]: Found both group and host with same name: gdansk
-
-PLAY [Instalacja i konfiguracja vsftpd] *****************************************************
-
-TASK [Gathering Facts] **********************************************************************
-fatal: [gdansk]: UNREACHABLE! => {"changed": false, "msg": "Failed to connect to the host via ssh: ssh: connect to host gdansk port 22: Connection refused", "unreachable": true}
+TASK [Znalezienie domyślnego pliku konfiguracyjnego] ****************************************
+skipping: [gdansk]
+skipping: [katowice]
+[WARNING]: Skipped '/usr/share/doc/vsftpd-*/' path due to this access issue:
+'/usr/share/doc/vsftpd-*/' is not a directory
 ok: [poznan]
 
-TASK [Instalacja vsftpd] ********************************************************************
-ok: [poznan]
+TASK [Przywrócenie domyślnego pliku konfiguracyjnego, jeśli nie istnieje] *******************
+skipping: [gdansk]
+skipping: [poznan]
+skipping: [katowice]
 
-TASK [Uruchomienie i włączenie vsftpd przy starcie] *****************************************
-ok: [poznan]
-
-TASK [Konfiguracja firewalld - dodanie usługi FTP] ******************************************
-ok: [poznan]
-
-TASK [Upewnienie się, że katalog /var/ftp/pub istnieje] *************************************
-ok: [poznan]
-
-TASK [Kopiowanie plików do katalogu /var/ftp/pub] *******************************************
-ok: [poznan] => (item=plik1.txt)
-ok: [poznan] => (item=plik2.txt)
+TASK [Kopia zapasowa pliku konfiguracyjnego przed zmianami] *********************************
+skipping: [poznan]
+ok: [gdansk]
+ok: [katowice]
 
 TASK [Modyfikacja pliku konfiguracyjnego vsftpd] ********************************************
-ok: [poznan]
+ok: [gdansk]
+ok: [katowice]
+fatal: [poznan]: FAILED! => {"changed": false, "msg": "Destination /etc/vsftpd/vsftpd.conf does not exist !", "rc": 257}
 
 PLAY RECAP **********************************************************************************
-gdansk                     : ok=0    changed=0    unreachable=1    failed=0    skipped=0    rescued=0    ignored=0
-poznan                     : ok=7    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
-
-[devops@base ansible_playbooks]$ ansible-playbook mariadb_when.yml                           [WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit
-localhost does not match 'all'
-
-PLAY [Instalacja serwera MariaDB na hostach spełniających warunki] **************************
-skipping: no hosts matched
+gdansk                     : ok=7    changed=0    unreachable=0    failed=0    skipped=2    rescued=0    ignored=0
+katowice                   : ok=7    changed=0    unreachable=0    failed=0    skipped=2    rescued=0    ignored=0
+poznan                     : ok=6    changed=0    unreachable=0    failed=1    skipped=2    rescued=0    ignored=0
