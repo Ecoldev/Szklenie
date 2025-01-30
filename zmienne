@@ -1,0 +1,156 @@
+Ćwiczenie 1 - Wykorzystywanie zmiennych
+Kroki wstępne: Zresetuj maszyny gdynia i krakow.
+Katalog roboczy: ~/ansible-vars1
+Cel: Napisz playbooka który zaimplementuje na serwerze krakow
+usługę FTP.
+Opis: Playbook powinien implementować usługę VSFTP zgodną ze
+specyfikacją na serwerze krakow.
+Specyfikacja:
+a. Usługa vsftpd powinna być w najnowszej możliwej
+wersji
+b. Usługa vsftpd powinna działać i uruchamiać się
+domyślnie podczas startu systemu
+c. Usługa ftp powinna być odblokowana na firewallu
+Nazwa pakietu, nazwa usługi systemd i nazwa usługi firewalld
+powinny zostać zaimplementowane jako zmienne w play’a.
+Poznasz trzy techniki dołączania zmiennych:
+- vars
+- vars_files
+- include_vars
+1. Stwórz plik ftp-vars.yml w którym będzie definicja play’a z nazwą, listą hostów:
+2. Dopisz sekcję z definicją zmiennych:
+---
+- name: Implementacja serwera vsftpd na serwerze gdynia
+hosts: krakow
+vars:
+ftp_package: vsftpd
+ftp_firewall: ftp
+ANSIBLE - zeszyt ćwiczeń
+44
+ftp_service: vsftpd
+3. Dodaj definicje zadań do wykonania:
+4. Pełen plik ftp-vars.yml powinien wyglądać w sposób następujący:
+tasks:
+- name: instalacja pakietu {{ ftp_package }}
+yum:
+name: "{{ ftp_package }}"
+state: latest
+- name: uruchomienie i autostart uslugi {{ ftp_service }}
+service:
+name: "{{ ftp_service }}"
+state: started
+enabled: true
+- name: firewall dla uslugi {{ ftp_firewall }}
+firewalld:
+service: "{{ ftp_firewall }}"
+permanent: yes
+state: enabled
+immediate: true
+---
+- name: Implementacja serwera vsftpd na serwerze gdynia
+hosts: krakow
+vars:
+ftp_package: vsftpd
+ftp_firewall: ftp
+ftp_service: vsftpd
+tasks:
+- name: instalacja pakietu {{ ftp_package }}
+yum:
+name: "{{ ftp_package }}"
+ANSIBLE - zeszyt ćwiczeń
+45
+5. Przetestuj działanie playbook’a:
+6. Skopiuj plik ftp-vars.yml do pliku ftp-vars-gdynia.yml i:
+a. Usuń sekcję vars definiującą zmienne
+b. Dopisz w definicji play’a dołączenie zewnętrznego pliku ze zmiennymi:
+vars.yml - dyrektywa vars_files
+c. Zmień hosta z krakow na gdynia
+Plik powinien wyglądać w sposób następujący:
+state: latest
+- name: uruchomienie i autostart uslugi {{ ftp_service }}
+service:
+name: "{{ ftp_service }}"
+state: started
+enabled: true
+- name: firewall dla uslugi {{ ftp_firewall }}
+firewalld:
+service: "{{ ftp_firewall }}"
+permanent: yes
+state: enabled
+immediate: true
+[user@warszawa ansible-vars1]$ ansible-playbook ./ftp-vars.yml
+[user@warszawa ansible-vars1]$ ftp krakow
+Connected to krakow (192.168.122.202).
+220 (vsFTPd 3.0.2)
+Name (krakow:user):
+---
+- name: Implementacja serwera vsftpd na serwerze gdynia
+hosts: gdynia
+vars_files: vars.yml
+tasks:
+- name: instalacja pakietu {{ ftp_package }}
+yum:
+name: "{{ ftp_package }}"
+state: latest
+ANSIBLE - zeszyt ćwiczeń
+46
+7. Stwórz plik vars.yml o następującej zawartości:
+8. Sprawdź czy playbook działa:
+[user@warszawa ansible-vars1]$ ansible-playbook ./ftp-vars-gdynia.yml
+9. Przetestuj kolejną formę dołączania zmiennych do play’a - bazując na pliku
+ftp-vars-gdynia.yml stwórz ftp-vars-gdynia2.yml modyfikując:
+a. Usuń z definicji play’a dyrektywę: vars_files: vars.yml
+b. Dodaj jako pierwszy task użycie modułu: include_vars
+Plik ftp-vars-gdynia2.yml powinien wyglądać w sposób następujący:
+- name: uruchomienie i autostart uslugi {{ ftp_service }}
+service:
+name: "{{ ftp_service }}"
+state: started
+enabled: true
+- name: firewall dla uslugi {{ ftp_firewall }}
+firewalld:
+service: "{{ ftp_firewall }}"
+permanent: yes
+state: enabled
+immediate: true
+ftp_package: vsftpd
+ftp_firewall: ftp
+ftp_service: vsftpd
+---
+- name: Implementacja serwera vsftpd na serwerze gdynia
+hosts: gdynia
+tasks:
+- name: Ustaw zmienne
+include_vars: vars.yml
+- name: instalacja pakietu {{ ftp_package }}
+yum:
+name: "{{ ftp_package }}"
+ANSIBLE - zeszyt ćwiczeń
+47
+10.Sprawdź czy playbook działa:
+[user@warszawa ansible-vars1]$ ansible-playbook ./ftp-vars-gdynia2.yml
+state: latest
+- name: uruchomienie i autostart uslugi {{ ftp_service }}
+service:
+name: "{{ ftp_service }}"
+state: started
+enabled: true
+- name: firewall dla uslugi {{ ftp_firewall }}
+firewalld:
+service: "{{ ftp_firewall }}"
+permanent: yes
+state: enabled
+immediate: true
+ANSIBLE - zeszyt ćwiczeń
+48
+ANSIBLE - zeszyt ćwiczeń
+49
+Ćwiczenie 2 - Wykorzystywanie zmiennych z projektu
+Kroki wstępne: Zresetuj maszyny gdynia i krakow.
+Katalog roboczy: ~/ansible-vars2
+Cel: Definiowanie zmiennych typu host_vars lub group_vars
+Opis: Stwórz odpowiednią strukturę do przechowywania zmiennych dlagrup
+i hostów w projekcie.
+Sprawdź jak zachowuje się nadpisywanie zmiennychdefiniowanych
+w różnych miejscach.
+1. Stwórz od
